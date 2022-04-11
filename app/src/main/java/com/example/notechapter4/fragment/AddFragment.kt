@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.notechapter4.R
 import com.example.notechapter4.databinding.FragmentAddBinding
@@ -30,11 +31,20 @@ class AddFragment(private val listNote : (Note)->Unit) : DialogFragment() {
                 btnSave.setOnClickListener {
                     val title : String = binding.etTitle.text.toString()
                     val note : String = binding.etNote.text.toString()
-                    val user = Note(
-                        null,title,note
-                    )
-                    listNote(user)
-                    dialog?.dismiss()
+                    if (title.isBlank() || note.isBlank()){
+                        Toast.makeText(
+                            requireContext(),
+                            "Required Data ",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }else{
+                        val user = Note(
+                            null,title,note
+                        )
+                        listNote(user)
+                        dialog?.dismiss()
+                    }
+
                 }
             }
             builder.create()

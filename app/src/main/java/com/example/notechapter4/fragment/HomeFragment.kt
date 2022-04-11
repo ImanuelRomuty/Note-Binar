@@ -2,6 +2,7 @@ package com.example.notechapter4.fragment
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -12,10 +13,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.notechapter4.MainActivity
 import com.example.notechapter4.R
 import com.example.notechapter4.adapter.NoteAdapter
 import com.example.notechapter4.databinding.EditDialogBinding
+import com.example.notechapter4.databinding.FragmentAddBinding
 import com.example.notechapter4.databinding.FragmentHomeBinding
 import com.example.notechapter4.databinding.FragmentLoginBinding
 import com.example.notechapter4.room.ApplicationDatabase
@@ -43,8 +46,20 @@ class HomeFragment : Fragment() {
         val getSharedPreferences = requireContext().getSharedPreferences(MainActivity.SHARED_PREFERENCES, Context.MODE_PRIVATE)
         fetchData()
         binding.usernameTextView.text = "Welcome ${getSharedPreferences?.getString("email",null)}"
+        //EVENT LOGOUT
+        binding.logoutButton.setOnClickListener {
+            val editor: SharedPreferences.Editor = getSharedPreferences.edit()
+            editor.clear()
+            editor.apply()
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToLoadingFragment())
+        }
+
+        //EVENT ADD DATA
         binding.addButton.setOnClickListener {
             val dialog = AddFragment{
+
+
+
                 lifecycleScope.launch(Dispatchers.IO) {
                     val result = mDB?.noteDao()?.insertNote(it)
                     activity?.runOnUiThread {
@@ -111,24 +126,33 @@ class HomeFragment : Fragment() {
                             val mDB = ApplicationDatabase.getInstance(requireContext())
                             data.tittle  = dialogBinding.titleEditText.text.toString()
                             data.note = dialogBinding.noteEditText.text.toString()
-                            lifecycleScope.launch(Dispatchers.IO){
-                                val result = mDB?.noteDao()?.updateNote(data)
-                                runBlocking(Dispatchers.Main){
-                                    if (result != 0){
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "${data.tittle} Berhasil di update!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        fetchData()
-                                        dialog.dismiss()
-                                    } else {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "${data.tittle} Gagal di update!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        dialog.dismiss()
+                            // NOT EMPTY
+                            if(data.tittle =="" || data.note ==""){
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Required Data ",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }else{
+                                lifecycleScope.launch(Dispatchers.IO){
+                                    val result = mDB?.noteDao()?.updateNote(data)
+                                    runBlocking(Dispatchers.Main){
+                                        if (result != 0){
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "${data.tittle} Berhasil di update!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            fetchData()
+                                            dialog.dismiss()
+                                        } else {
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "${data.tittle} Gagal di update!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            dialog.dismiss()
+                                        }
                                     }
                                 }
                             }
