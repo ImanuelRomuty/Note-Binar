@@ -48,7 +48,6 @@ class RegisterFragment : Fragment() {
             val email               = binding.inputEmailEditText.text.toString()
             val password            = binding.inputPasswordEditText.text.toString()
             val confirmPassword     = binding.inputConfirmPasswordEditText.text.toString()
-
             val registerCheckEmpty = User(null,username,email,password)
             when{
                 username.isNullOrEmpty() -> {

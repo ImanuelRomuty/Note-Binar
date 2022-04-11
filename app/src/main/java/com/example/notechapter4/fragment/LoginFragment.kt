@@ -68,7 +68,7 @@ class LoginFragment : Fragment() {
                 }
             }
         }
-//        Log.d("TEST LOGIN",)
+
 
         //EVENT SIGN UP
         binding.registerButton.setOnClickListener {
